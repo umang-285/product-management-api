@@ -25,4 +25,4 @@ class LoginView(generics.GenericAPIView):
 
 
 class LogoutView(TokenBlacklistView):
-    pass
+    permission_classes = [AllowAny]
