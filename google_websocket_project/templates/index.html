@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <style>
+        #chat-log {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat</h1>
+    <div id="chat-log"></div>
+    <input id="chat-message-input" type="text" size="100">
+    <button id="send-button">Send</button>
+
+    <script>
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwOTI1NjAyLCJpYXQiOjE3NDA5MjQ3MDIsImp0aSI6IjU2ZTllYzNmM2Y2OTQxZDI4MmY3ZDI4MjA3NzJkMTc2IiwidXNlcl9pZCI6NH0.3ukBeQ0AFHA70u4LI681XbxvMv3WNKpoFNfQICxSkP4";
+        const receiverId = 3; // Change to the actual receiver user ID
+        const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${receiverId}/${token}`);
+        console.log(ws.data);
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const chatLog = document.getElementById('chat-log');
+            chatLog.innerHTML += `<p><strong>${data.sender_username}:</strong> ${data.message}</p>`;
+            chatLog.scrollTop = chatLog.scrollHeight;
+        };
+
+        document.getElementById('send-button').addEventListener('click', function() {
+            const input = document.getElementById('chat-message-input');
+            const message = input.value.trim();
+
+            if (message) {
+                ws.send(JSON.stringify({ message: message, receiver_id: receiverId }));
+                input.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
